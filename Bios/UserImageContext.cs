@@ -21,14 +21,6 @@ namespace Bios
 
         public string? ImageUrl { get; set; }
 
-        public int? DeleteStatus { get; set; }
-
-        public int? SubmitStatus { get; set; }
-
-        public DateTime? SubmitTime { get; set; }
-
-        public DateTime? CreatedTime { get; set; }
-
-        public DateTime? UpdatedTime { get; set; }
+        public DateTime CreatedAt { get; set; } = DateTime.Now;
     }
 }

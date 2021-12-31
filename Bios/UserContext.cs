@@ -21,5 +21,6 @@ namespace Bios
         public string? PersonId { get; set; }
 
         public string? PersonGroupId { get; set; }
+        public DateTime CreatedAt { get; set; } = DateTime.Now;
     }
 }

@@ -1,11 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Bios;
-/* using System.Net.Http;
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;*/
-using System;
-using System.IO;
+
 using System.Diagnostics;
 
 using Microsoft.Azure.CognitiveServices.Vision.ComputerVision;
@@ -13,7 +8,6 @@ using Microsoft.Azure.CognitiveServices.Vision.ComputerVision.Models;
 
 using Microsoft.Azure.CognitiveServices.Vision.Face;
 using Microsoft.Azure.CognitiveServices.Vision.Face.Models;
-using Newtonsoft.Json.Linq;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -499,9 +493,7 @@ static async void OnCreated(object sender, FileSystemEventArgs e)
                 {
                     FaceId = pfId,
                     UserId = user.Id,
-                    ImageUrl = temp,
-                    DeleteStatus = 0,
-                    SubmitStatus = 0
+                    ImageUrl = temp
                 };
                 dbUserImage.UserImages.Add(userImage);
                 dbUserImage.SaveChanges();
