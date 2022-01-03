@@ -14,7 +14,7 @@ namespace Bios
         {
             try
             {
-                string temp = ImageUrl.Replace(Constants.imagesDirectory + Path.DirectorySeparatorChar, "");
+                string temp = @ImageUrl.Replace(Constants.imagesDirectory + Path.DirectorySeparatorChar, "");
                 var arrTemp = temp.Split(Path.DirectorySeparatorChar);
 
                 if (arrTemp.Length == 3)

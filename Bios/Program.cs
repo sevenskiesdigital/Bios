@@ -47,6 +47,35 @@ app.MapPost("/userImages", (UserImageContext db, UserImage userImage) =>
     Results.Accepted();
 });
 
+app.MapPost("/personImage", async (UserImage userImage) =>
+{
+    string[] extensions = { ".jpg", ".jpeg", ".png" };
+    // get the file's extension 
+    var ext = (Path.GetExtension(userImage.ImageUrl) ?? string.Empty).ToLower();
+
+    // filter file types 
+    if (extensions.Any(ext.Equals))
+    {
+        Debug.WriteLine(Constants.onProcess);
+        while (Constants.onProcess)
+        {
+            Thread.Sleep(2000);
+        }
+        Constants.onProcess = true;
+
+        PersonImage PI = new PersonImage();
+        PI.ImageUrl = userImage.ImageUrl;
+        await PI.addPersonImage();
+
+        Constants.onProcess = false;
+        Results.Accepted();
+    } else
+    {
+        Debug.WriteLine("cek3");
+        Results.BadRequest();
+    }
+});
+
 app.MapPost("/vision", async (imageUrl imageUrl) =>
 {
     string CogServicesSecret = "9ecb457394bf4052af128281000652a8";
