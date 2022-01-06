@@ -113,6 +113,26 @@ app.MapPost("/face", async (imageUrl imageUrl) =>
     return faceList;
 });
 
+app.MapPost("/faceBase64", async (imageUrl imageUrl) =>
+{
+    string CogServicesSecret = "9ecb457394bf4052af128281000652a8";
+    string Endpoint = "https://bios.cognitiveservices.azure.com/";
+    var credentials = new ApiKeyServiceClientCreds(CogServicesSecret);
+    var client = new FaceClient(credentials)
+    {
+        Endpoint = Endpoint
+    };
+
+    var bytes = Convert.FromBase64String(imageUrl.Base64);
+    var contents = new MemoryStream(bytes);
+
+    IList<DetectedFace> faceList = await client.Face.DetectWithStreamAsync(contents);
+    Debug.WriteLine(imageUrl.Url);
+    Debug.WriteLine(faceList.Count);
+    //Results.Ok(faceList);
+    return faceList;
+});
+
 app.MapPost("/face/identification", async (imageUrl imageUrl) =>
 {
     string CogServicesSecret = "9ecb457394bf4052af128281000652a8";
@@ -528,6 +548,7 @@ app.Run();
 class imageUrl
 {
     public string? Url { get; set; }
+    public string? Base64 { get; set; }
 
     public string? PersonGroupId { get; set; }
     public string? PersonId { get; set; }
