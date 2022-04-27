@@ -237,6 +237,83 @@ app.MapPost("/face/verification", async (imageUrl imageUrl) =>
 
 });
 
+app.MapPost("/face/attendance", async (imageUrl imageUrl) =>
+{
+    string CogServicesSecret = "9ecb457394bf4052af128281000652a8";
+    string Endpoint = "https://bios.cognitiveservices.azure.com/";
+    var credentials = new ApiKeyServiceClientCreds(CogServicesSecret);
+    var client = new FaceClient(credentials)
+    {
+        Endpoint = Endpoint
+    };
+
+    try
+    {
+        List<Guid> sourceFaceIds = new List<Guid>();
+        // Detect faces from source image url.
+        Debug.WriteLine(imageUrl.Url);
+        Debug.WriteLine(imageUrl.PersonGroupId);
+        IList<DetectedFace> detectedFaces = await client.Face.DetectWithUrlAsync(imageUrl.Url);
+        Debug.WriteLine(detectedFaces.Count);
+
+        // Add detected faceId to sourceFaceIds.
+        foreach (var detectedFace in detectedFaces)
+        {
+            sourceFaceIds.Add(detectedFace.FaceId.Value);
+            Debug.WriteLine(detectedFace.FaceId.Value);
+        }
+        Debug.WriteLine(sourceFaceIds.Count);
+
+        if (imageUrl.EmployeeNumber != null)
+        {
+            var userContextOptions = new DbContextOptionsBuilder<UserContext>()
+                .UseInMemoryDatabase(databaseName: "InMemoryDb")
+                .Options;
+            UserContext dbUser = new UserContext(userContextOptions);
+            var users = dbUser.Users.Where(x => x.EmployeeNumber == imageUrl.EmployeeNumber
+                                  && x.PersonGroupId == imageUrl.PersonGroupId)
+                                  .ToList();
+            int m = users.Count;
+            if (m > 0)
+            {
+                imageUrl.PersonId = users[0].PersonId;
+            }
+        }
+
+        var verifyResults = await client.Face.VerifyFaceToPersonAsync(faceId: sourceFaceIds[0], personId: new Guid(imageUrl.PersonId), largePersonGroupId: imageUrl.PersonGroupId);
+
+
+        // object detection
+        var client2 = new ComputerVisionClient(credentials)
+        {
+            Endpoint = Endpoint
+        };
+        DetectResult analysis = await client2.DetectObjectsAsync(imageUrl.Url);
+        Debug.WriteLine(imageUrl.Url);
+        Debug.WriteLine(analysis.Objects.Count);
+        // var detectResults = analysis.Objects;
+        List<string> detectedObjects = new List<string>();
+        foreach (var obj in analysis.Objects)
+        {
+            Debug.WriteLine($"{obj.ObjectProperty} with confidence {obj.Confidence}");
+            detectedObjects.Add(obj.ObjectProperty);
+        }
+        //Results.Ok(analysis.Objects[0]);
+        var results = new { 
+            verifyResults,
+            detectedObjects
+        };
+
+        return results;
+    }
+    catch (Exception e)
+    {
+        PrintException(e);
+        return null;
+    }
+
+});
+
 app.MapPost("/personGroup/training", async (PersonGroup PG) =>
 {
     string CogServicesSecret = "9ecb457394bf4052af128281000652a8";
