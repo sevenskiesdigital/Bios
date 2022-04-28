@@ -472,7 +472,9 @@ if (app.Environment.IsDevelopment())
 
 //FileWatcher fileWatcher = new FileWatcher();
 // Cek Folder Images
-using var watcher = new FileSystemWatcher(Constants.imagesDirectory);
+string basePath = AppDomain.CurrentDomain.BaseDirectory;
+System.Diagnostics.Debug.WriteLine(basePath);
+using var watcher = new FileSystemWatcher(basePath);
 watcher.NotifyFilter = NotifyFilters.Attributes
                  | NotifyFilters.CreationTime
                  | NotifyFilters.DirectoryName
@@ -505,12 +507,10 @@ static void OnChanged(object sender, FileSystemEventArgs e)
 static async void OnCreated(object sender, FileSystemEventArgs e)
 {
     string value = $"Created: {e.FullPath}";
-    Debug.WriteLine(value);
 
     string[] extensions = { ".jpg", ".jpeg", ".png" };
     // get the file's extension 
     var ext = (Path.GetExtension(e.FullPath) ?? string.Empty).ToLower();
-
     // filter file types 
     if (extensions.Any(ext.Equals))
     {
@@ -519,6 +519,7 @@ static async void OnCreated(object sender, FileSystemEventArgs e)
             Thread.Sleep(2000);
         }
         Constants.onProcess = true;
+        Debug.WriteLine(Constants.onProcess);
 
         PersonImage PI = new PersonImage();
         PI.ImageUrl = e.FullPath;

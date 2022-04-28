@@ -14,7 +14,9 @@ namespace Bios
         {
             try
             {
-                string temp = @ImageUrl.Replace(Constants.imagesDirectory + Path.DirectorySeparatorChar, "");
+                string basePath = AppDomain.CurrentDomain.BaseDirectory;
+                string temp = @ImageUrl.Replace(basePath, "");
+
                 var arrTemp = temp.Split(Path.DirectorySeparatorChar);
 
                 if (arrTemp.Length == 3)
@@ -103,7 +105,7 @@ namespace Bios
                                           .ToList().Count;
                     if (n <= 0)
                     {
-                        FileStream fs = new FileStream(Constants.imagesDirectory + Path.DirectorySeparatorChar + temp, FileMode.Open);
+                        FileStream fs = new FileStream(basePath + Path.DirectorySeparatorChar + temp, FileMode.Open);
                         PersistedFace PF = await client.LargePersonGroupPerson.AddFaceFromStreamAsync(largePersonGroupId: PersonGroupId, new Guid(user.PersonId), image: fs);
                         Debug.WriteLine(PF.PersistedFaceId);
                         var pfId = PF.PersistedFaceId.ToString() == null ? null : PF.PersistedFaceId.ToString();
